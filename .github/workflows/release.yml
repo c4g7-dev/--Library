@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Zip dist
+        run: |
+          cd dist
+          zip -r ../library-web-${{ github.ref_name || github.event.inputs.tag }}.zip .
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name || github.event.inputs.tag }}
+          name: Library ${{ github.ref_name || github.event.inputs.tag }}
+          body: |
+            ## Library Music Player
+
+            AMOLED dark music player — `.opus` file support with spinning vinyl disk UI.
+
+            ### Install
+            **Web:** Extract `library-web-*.zip` and serve with any static file server.
+
+            **Android (Capacitor):** Use the web zip with `npx cap sync android && npx cap build android` locally to produce an APK.
+
+            ### What's new
+            - 3-column AMOLED library grid with cover arts
+            - Spinning vinyl disk player
+            - Red arc progress rings per track
+            - Folder-based `.opus` file loading
+            - Settings with directory picker
+          files: |
+            library-web-${{ github.ref_name || github.event.inputs.tag }}.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: false
