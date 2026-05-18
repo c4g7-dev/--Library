@@ -1,149 +1,252 @@
 package dev.c4g7.library.ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.c4g7.library.ui.components.VinylDisk
-import dev.c4g7.library.ui.theme.AccentRed
+import dev.c4g7.library.ui.i18n.LocalStrings
+import dev.c4g7.library.ui.theme.AccentBlue
+import dev.c4g7.library.ui.theme.AccentBlueDim
 import dev.c4g7.library.ui.theme.TextSecondary
 import dev.c4g7.library.viewmodel.PlayerViewModel
 
 @Composable
 fun PlayerScreen(playerViewModel: PlayerViewModel) {
     val state by playerViewModel.state.collectAsState()
+    val strings = LocalStrings.current
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF000000))
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Spacer(Modifier.height(16.dp))
-
-        // Vinyl disk
-        VinylDisk(
-            coverArtBytes = state.currentTrack?.coverArtBytes,
-            isPlaying = state.isPlaying,
-            size = 290.dp
+        // Subtle blue ambient behind the vinyl
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+                .align(Alignment.TopCenter)
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(
+                            AccentBlue.copy(alpha = if (state.isPlaying) 0.06f else 0.025f),
+                            Color.Transparent
+                        ),
+                        radius = 720f
+                    )
+                )
         )
 
-        // Track info
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = state.currentTrack?.title ?: "Nothing playing",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = state.currentTrack?.artist ?: "",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+            Spacer(Modifier.height(20.dp))
 
-        // Progress
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Slider(
-                value = state.progressFraction,
-                onValueChange = { playerViewModel.seekTo(it) },
-                colors = SliderDefaults.colors(
-                    thumbColor = AccentRed,
-                    activeTrackColor = AccentRed,
-                    inactiveTrackColor = Color(0xFF2A2A2A)
-                ),
+            // "NOW PLAYING" label
+            Text(
+                text = strings.nowPlaying,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 3.sp,
+                color = Color(0xFF444444)
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            // Vinyl disk
+            VinylDisk(
+                coverArtBytes = state.currentTrack?.coverArtBytes,
+                isPlaying = state.isPlaying,
+                size = 292.dp
+            )
+
+            Spacer(Modifier.height(28.dp))
+
+            // Track info + controls card — Material 3, squarish corners
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFF0D0D0D),
                 modifier = Modifier.fillMaxWidth()
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = formatMs(state.positionMs),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary
-                )
-                Text(
-                    text = formatMs(state.durationMs),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary
-                )
-            }
-        }
-
-        // Controls
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = { playerViewModel.skipPrev() },
-                modifier = Modifier.size(56.dp)
-            ) {
-                Icon(
-                    Icons.Filled.SkipPrevious,
-                    contentDescription = "Previous",
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape)
-                    .background(AccentRed),
-                contentAlignment = Alignment.Center
-            ) {
-                IconButton(onClick = { playerViewModel.togglePlayPause() }) {
-                    Icon(
-                        imageVector = if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        contentDescription = if (state.isPlaying) "Pause" else "Play",
-                        tint = Color.White,
-                        modifier = Modifier.size(36.dp)
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Title
+                    Text(
+                        text = state.currentTrack?.title ?: strings.nothingPlaying,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        letterSpacing = (-0.2).sp
                     )
+
+                    Spacer(Modifier.height(4.dp))
+
+                    // Artist
+                    Text(
+                        text = state.currentTrack?.artist ?: "",
+                        fontSize = 13.sp,
+                        color = TextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    // Album
+                    if (!state.currentTrack?.album.isNullOrEmpty() &&
+                        state.currentTrack?.album != state.currentTrack?.artist
+                    ) {
+                        Text(
+                            text = state.currentTrack?.album ?: "",
+                            fontSize = 11.sp,
+                            color = Color(0xFF444444),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    HorizontalDivider(color = Color(0xFF1A1A1A))
+
+                    Spacer(Modifier.height(14.dp))
+
+                    // Progress — seekable
+                    var isDragging by remember { mutableStateOf(false) }
+                    var dragValue by remember { mutableStateOf(0f) }
+
+                    Slider(
+                        value = if (isDragging) dragValue else state.progressFraction,
+                        onValueChange = { v ->
+                            isDragging = true
+                            dragValue = v
+                        },
+                        onValueChangeFinished = {
+                            playerViewModel.seekTo(dragValue)
+                            isDragging = false
+                        },
+                        colors = SliderDefaults.colors(
+                            thumbColor = AccentBlue,
+                            activeTrackColor = AccentBlue,
+                            inactiveTrackColor = Color(0xFF252525)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(formatMs(state.positionMs), fontSize = 11.sp, color = Color(0xFF555555))
+                        Text(formatMs(state.durationMs), fontSize = 11.sp, color = Color(0xFF555555))
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Controls
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Shuffle (decorative)
+                        IconButton(onClick = {}, modifier = Modifier.size(44.dp)) {
+                            Icon(
+                                Icons.Filled.Shuffle,
+                                contentDescription = strings.shuffle,
+                                tint = Color(0xFF303030),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        // Previous — squarish filled icon button
+                        FilledTonalIconButton(
+                            onClick = { playerViewModel.skipPrev() },
+                            modifier = Modifier.size(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = Color(0xFF1A1A1A)
+                            )
+                        ) {
+                            Icon(
+                                Icons.Filled.SkipPrevious,
+                                contentDescription = "Previous",
+                                tint = Color(0xFFCCCCCC),
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+
+                        // Play / Pause — squarish, primary blue
+                        FilledIconButton(
+                            onClick = { playerViewModel.togglePlayPause() },
+                            modifier = Modifier.size(60.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = AccentBlue
+                            )
+                        ) {
+                            Icon(
+                                imageVector = if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                contentDescription = if (state.isPlaying) "Pause" else "Play",
+                                tint = Color(0xFF000000),
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+                        // Next — squarish filled icon button
+                        FilledTonalIconButton(
+                            onClick = { playerViewModel.skipNext() },
+                            modifier = Modifier.size(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = Color(0xFF1A1A1A)
+                            )
+                        ) {
+                            Icon(
+                                Icons.Filled.SkipNext,
+                                contentDescription = "Next",
+                                tint = Color(0xFFCCCCCC),
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+
+                        // Repeat (decorative)
+                        IconButton(onClick = {}, modifier = Modifier.size(44.dp)) {
+                            Icon(
+                                Icons.Filled.Repeat,
+                                contentDescription = strings.repeat,
+                                tint = Color(0xFF303030),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
             }
 
-            IconButton(
-                onClick = { playerViewModel.skipNext() },
-                modifier = Modifier.size(56.dp)
-            ) {
-                Icon(
-                    Icons.Filled.SkipNext,
-                    contentDescription = "Next",
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+            Spacer(Modifier.height(16.dp))
         }
-
-        Spacer(Modifier.height(8.dp))
     }
 }
 

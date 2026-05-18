@@ -14,6 +14,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
+        buildConfigField("String", "ZIP_PASSWORD", "\"gVZEt1j54+hg89_0rt84xm\"")
     }
 
     buildTypes {
@@ -31,6 +32,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -52,10 +54,8 @@ dependencies {
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.media3.exoplayer)
-    implementation(libs.media3.session)
     implementation(libs.coil.compose)
     implementation(libs.zip4j)
-    implementation(libs.security.crypto)
     implementation(libs.kotlinx.coroutines.android)
     debugImplementation(libs.androidx.ui.tooling)
 }

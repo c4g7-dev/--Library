@@ -11,6 +11,7 @@ coil = "2.6.0"
 zip4j = "2.11.5"
 securityCrypto = "1.1.0-alpha06"
 coroutines = "1.8.1"
+appcompat = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version.ref = "zip4j" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -28,12 +28,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.7'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew || true
 
       - name: Build Debug APK
         run: gradle assembleDebug
@@ -51,21 +53,17 @@ jobs:
           body: |
             ## Library ${{ github.ref_name || github.event.inputs.tag }}
 
-            AMOLED dark music player for Android. Plays `.opus` files from a password-protected ZIP.
+            AMOLED dark music player for Android.
 
             ### Install
-            1. Download `library-*.apk`
-            2. On your Android device: **Settings → Apps → Install unknown apps** → allow your browser/Files app
-            3. Open the APK and install
+            Download `library-*.apk`, enable **Install from unknown sources** in Android settings, then install.
 
-            ### First launch
-            1. Go to **Settings** tab
-            2. Tap the folder icon to pick your `.zip` file
-            3. Enter your decrypt passphrase
-            4. Tap **Unlock & Load Library**
-            5. Tap any track in the grid to play
+            ### Setup
+            1. Prepare a password-protected ZIP of `.opus` files (see README)
+            2. Open app -> Settings -> pick ZIP + enter passphrase -> Unlock & Load
+            3. Tap any track to play
 
-            > Debug build — unsigned. For a signed release APK see the README.
+            > This is a debug build. For signed release APKs, set up signing secrets in CI.
           files: library-${{ github.ref_name || github.event.inputs.tag }}.apk
           draft: false
           prerelease: false

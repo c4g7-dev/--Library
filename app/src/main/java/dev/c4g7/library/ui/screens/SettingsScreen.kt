@@ -3,34 +3,37 @@ package dev.c4g7.library.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FolderZip
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import dev.c4g7.library.ui.theme.AccentRed
+import androidx.compose.ui.unit.sp
+import dev.c4g7.library.ui.i18n.LocalStrings
+import dev.c4g7.library.ui.theme.AccentBlue
 import dev.c4g7.library.viewmodel.LibraryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     libraryViewModel: LibraryViewModel,
+    language: String,
+    onLanguageChange: (String) -> Unit,
     onLoad: () -> Unit
 ) {
+    val strings = LocalStrings.current
     var zipUri by remember { mutableStateOf(libraryViewModel.savedZipUri) }
-    var password by remember { mutableStateOf(libraryViewModel.savedPassword) }
-    var passwordVisible by remember { mutableStateOf(false) }
     var gapless by remember { mutableStateOf(false) }
 
     val zipPicker = rememberLauncherForActivityResult(
@@ -43,7 +46,13 @@ fun SettingsScreen(
         containerColor = Color(0xFF000000),
         topBar = {
             TopAppBar(
-                title = { Text("Settings", style = MaterialTheme.typography.headlineLarge, color = Color.White) },
+                title = {
+                    Text(
+                        strings.settings,
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Color.White
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF000000))
             )
         }
@@ -55,9 +64,9 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item { Spacer(Modifier.height(8.dp)) }
+            item { Spacer(Modifier.height(4.dp)) }
 
-            item { SettingsSectionHeader("Source") }
+            item { SettingsSectionHeader(strings.source) }
 
             item {
                 SettingsCard {
@@ -65,102 +74,158 @@ fun SettingsScreen(
                         OutlinedTextField(
                             value = zipUri,
                             onValueChange = { zipUri = it },
-                            label = { Text("ZIP file path / URI", color = Color(0xFF888888)) },
+                            label = { Text(strings.zipFile, color = Color(0xFF888888)) },
                             trailingIcon = {
-                                IconButton(onClick = {
-                                    zipPicker.launch(arrayOf("application/zip", "application/octet-stream", "*/*"))
-                                }) {
-                                    Icon(Icons.Filled.FolderZip, contentDescription = "Pick ZIP", tint = Color(0xFF888888))
-                                }
-                            },
-                            colors = outlinedTextFieldColors(),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            label = { Text("Decrypt passphrase", color = Color(0xFF888888)) },
-                            leadingIcon = {
-                                Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFF888888))
-                            },
-                            trailingIcon = {
-                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                IconButton(
+                                    onClick = {
+                                        zipPicker.launch(
+                                            arrayOf(
+                                                "application/zip",
+                                                "application/octet-stream",
+                                                "*/*"
+                                            )
+                                        )
+                                    }
+                                ) {
                                     Icon(
-                                        if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                        contentDescription = null,
+                                        Icons.Filled.FolderZip,
+                                        contentDescription = "Pick ZIP",
                                         tint = Color(0xFF888888)
                                     )
                                 }
                             },
-                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                            colors = outlinedTextFieldColors(),
+                            colors = textFieldColors(),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
+
                         Button(
                             onClick = {
-                                if (zipUri.isNotEmpty() && password.isNotEmpty()) {
-                                    libraryViewModel.loadZip(Uri.parse(zipUri), password)
+                                if (zipUri.isNotEmpty()) {
+                                    libraryViewModel.loadZip(Uri.parse(zipUri))
                                     onLoad()
                                 }
                             },
-                            enabled = zipUri.isNotEmpty() && password.isNotEmpty(),
+                            enabled = zipUri.isNotEmpty(),
+                            shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = AccentRed,
-                                disabledContainerColor = Color(0xFF2A2A2A)
+                                containerColor = AccentBlue,
+                                contentColor = Color(0xFF000000),
+                                disabledContainerColor = Color(0xFF1E1E1E),
+                                disabledContentColor = Color(0xFF444444)
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Unlock & Load Library", color = Color.White)
+                            Text(strings.loadLibrary, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
             }
 
-            item { Spacer(Modifier.height(8.dp)) }
-            item { SettingsSectionHeader("Playback") }
+            item { Spacer(Modifier.height(4.dp)) }
+            item { SettingsSectionHeader(strings.playback) }
 
             item {
                 SettingsCard {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text("Gapless Playback", style = MaterialTheme.typography.bodyMedium, color = Color.White)
-                            Text("No silence between tracks", style = MaterialTheme.typography.labelSmall, color = Color(0xFF666666))
-                        }
-                        Switch(
-                            checked = gapless,
-                            onCheckedChange = { gapless = it },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = AccentRed,
-                                uncheckedThumbColor = Color(0xFF666666),
-                                uncheckedTrackColor = Color(0xFF222222)
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        // Gapless toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    strings.gaplessPlayback,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White
+                                )
+                                Text(
+                                    strings.gaplessDesc,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF666666)
+                                )
+                            }
+                            Switch(
+                                checked = gapless,
+                                onCheckedChange = { gapless = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = AccentBlue,
+                                    uncheckedThumbColor = Color(0xFF666666),
+                                    uncheckedTrackColor = Color(0xFF222222)
+                                )
                             )
-                        )
+                        }
+
+                        HorizontalDivider(color = Color(0xFF1A1A1A))
+
+                        // Language toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                strings.language,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .border(1.dp, Color(0xFF2A2A2A), RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(8.dp))
+                            ) {
+                                LanguageChip(
+                                    label = "EN",
+                                    selected = language == "en",
+                                    onClick = { onLanguageChange("en") }
+                                )
+                                LanguageChip(
+                                    label = "DE",
+                                    selected = language == "de",
+                                    onClick = { onLanguageChange("de") }
+                                )
+                            }
+                        }
                     }
                 }
             }
 
-            item { Spacer(Modifier.height(8.dp)) }
-            item { SettingsSectionHeader("About") }
+            item { Spacer(Modifier.height(4.dp)) }
+            item { SettingsSectionHeader(strings.about) }
 
             item {
                 SettingsCard {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        SettingsAboutRow("App", "Library")
-                        SettingsAboutRow("Format", ".opus in AES-256 ZIP")
-                        SettingsAboutRow("Version", "1.0.0")
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        SettingsAboutRow("App", strings.appTitle)
+                        SettingsAboutRow(strings.format, ".opus · AES-256 ZIP")
+                        SettingsAboutRow(strings.version, "1.0.0")
                     }
                 }
             }
 
             item { Spacer(Modifier.height(32.dp)) }
         }
+    }
+}
+
+@Composable
+private fun LanguageChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .background(if (selected) AccentBlue else Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 7.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            fontSize = 13.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+            color = if (selected) Color(0xFF000000) else Color(0xFF888888)
+        )
     }
 }
 
@@ -177,7 +242,7 @@ private fun SettingsSectionHeader(title: String) {
 @Composable
 private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color(0xFF0D0D0D),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -197,11 +262,11 @@ private fun SettingsAboutRow(label: String, value: String) {
 }
 
 @Composable
-private fun outlinedTextFieldColors() = OutlinedTextFieldDefaults.colors(
+private fun textFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedTextColor = Color.White,
     unfocusedTextColor = Color.White,
-    focusedBorderColor = AccentRed,
+    focusedBorderColor = AccentBlue,
     unfocusedBorderColor = Color(0xFF333333),
-    cursorColor = AccentRed,
-    focusedLabelColor = AccentRed,
+    cursorColor = AccentBlue,
+    focusedLabelColor = AccentBlue,
 )

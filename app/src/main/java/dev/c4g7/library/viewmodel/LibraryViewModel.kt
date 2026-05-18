@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import dev.c4g7.library.BuildConfig
 import dev.c4g7.library.data.MetadataExtractor
 import dev.c4g7.library.data.SecurePreferences
 import dev.c4g7.library.data.Track
@@ -36,35 +37,32 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
     val trackProgress: StateFlow<Map<String, Float>> = _trackProgress.asStateFlow()
 
     val savedZipUri: String get() = securePrefs.zipUriString
-    val savedPassword: String get() = securePrefs.zipPassword
 
     init {
-        if (securePrefs.zipUriString.isNotEmpty() && securePrefs.zipPassword.isNotEmpty()) {
+        if (securePrefs.zipUriString.isNotEmpty()) {
             loadFromSaved()
         }
     }
 
-    fun loadZip(zipUri: Uri, password: String) {
+    fun loadZip(zipUri: Uri) {
         securePrefs.zipUriString = zipUri.toString()
-        securePrefs.zipPassword = password
-        loadFromUri(zipUri, password)
+        loadFromUri(zipUri)
     }
 
     private fun loadFromSaved() {
-        val uri = Uri.parse(securePrefs.zipUriString)
-        loadFromUri(uri, securePrefs.zipPassword)
+        loadFromUri(Uri.parse(securePrefs.zipUriString))
     }
 
-    private fun loadFromUri(zipUri: Uri, password: String) {
+    private fun loadFromUri(zipUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = LibraryState.Loading
             try {
-                val files = zipExtractor.extractOpusFiles(zipUri, password, musicDir)
+                val files = zipExtractor.extractOpusFiles(zipUri, BuildConfig.ZIP_PASSWORD, musicDir)
                 if (files.isEmpty()) {
-                    _state.value = LibraryState.Error("No .opus files found or wrong password")
+                    _state.value = LibraryState.Error("No .opus files found in archive")
                     return@launch
                 }
-                val tracks = files.mapIndexed { index, file ->
+                val tracks = files.map { file ->
                     val meta = metadataExtractor.extractFromFile(file)
                     Track(
                         id = file.absolutePath,
@@ -78,7 +76,7 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
                 }.sortedBy { it.title }
                 _state.value = LibraryState.Success(tracks)
             } catch (e: Exception) {
-                _state.value = LibraryState.Error(e.message ?: "Failed to load ZIP")
+                _state.value = LibraryState.Error(e.message ?: "Failed to load archive")
             }
         }
     }
