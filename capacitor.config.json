@@ -1,0 +1,31 @@
+{
+  "appId": "com.amoled.musicplayer",
+  "appName": "Library",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "android": {
+    "buildOptions": {
+      "keystorePath": null,
+      "keystoreAlias": null,
+      "keystorePassword": null,
+      "keystoreAliasPassword": null,
+      "releaseType": "APK"
+    }
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "backgroundColor": "#000000",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "Filesystem": {
+      "readPermissions": true,
+      "writePermissions": false
+    }
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
