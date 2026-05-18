@@ -98,11 +98,16 @@ fun LibraryScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(s.tracks, key = { it.id }) { track ->
+                            val isCurrentTrack = playerState.currentTrack?.id == track.id
                             TrackCard(
                                 track = track,
                                 progress = trackProgress[track.id] ?: 0f,
+                                isCurrentlyPlaying = isCurrentTrack,
+                                isActivePlaying = isCurrentTrack && playerState.isPlaying,
                                 onClick = {
-                                    playerViewModel.playQueue(s.tracks, s.tracks.indexOf(track))
+                                    if (!isCurrentTrack) {
+                                        playerViewModel.playQueue(s.tracks, s.tracks.indexOf(track))
+                                    }
                                     onTrackClick()
                                 }
                             )
