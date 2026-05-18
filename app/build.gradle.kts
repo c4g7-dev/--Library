@@ -59,5 +59,6 @@ dependencies {
     implementation(libs.zip4j)
     implementation(libs.security.crypto)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.appcompat)
     debugImplementation(libs.androidx.ui.tooling)
 }
