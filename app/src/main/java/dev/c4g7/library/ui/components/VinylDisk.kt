@@ -28,8 +28,8 @@ fun VinylDisk(
 ) {
     val rotation = remember { Animatable(0f) }
     val glowAlpha by animateFloatAsState(
-        targetValue = if (isPlaying) 1f else 0.3f,
-        animationSpec = tween(600, easing = EaseInOutQuad),
+        targetValue = if (isPlaying) 1f else 0.25f,
+        animationSpec = tween(700, easing = EaseInOutQuad),
         label = "glow"
     )
 
@@ -46,19 +46,16 @@ fun VinylDisk(
         }
     }
 
-    Box(
-        modifier = modifier.size(size),
-        contentAlignment = Alignment.Center
-    ) {
-        // Outer glow
+    Box(modifier = modifier.size(size), contentAlignment = Alignment.Center) {
+        // Glow halo — blue tint, visible on AMOLED
         Box(
             modifier = Modifier
                 .size(size)
                 .shadow(
-                    elevation = (36 * glowAlpha).dp,
+                    elevation = (40 * glowAlpha).dp,
                     shape = CircleShape,
-                    ambientColor = Color(0xFFEF5350).copy(alpha = 0.35f * glowAlpha),
-                    spotColor = Color(0xFFEF5350).copy(alpha = 0.5f * glowAlpha)
+                    ambientColor = Color(0xFF5BA4F5).copy(alpha = 0.28f * glowAlpha),
+                    spotColor = Color(0xFF82B4FF).copy(alpha = 0.45f * glowAlpha)
                 )
         )
 
@@ -73,78 +70,87 @@ fun VinylDisk(
                 val cy = this.size.height / 2
                 val outerR = this.size.minDimension / 2f
 
-                // Base vinyl body
+                // Vinyl body — dark charcoal radial gradient (clearly NOT black on AMOLED)
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFF111111), Color(0xFF080808)),
+                        colors = listOf(Color(0xFF2C2C2C), Color(0xFF141414)),
                         center = androidx.compose.ui.geometry.Offset(cx, cy),
                         radius = outerR
                     ),
                     radius = outerR
                 )
 
-                // Groove rings — two interleaved shades for depth
-                var r = outerR * 0.97f
+                // Strong outer chrome rim — makes the disk edge pop against AMOLED black
+                drawCircle(
+                    color = Color(0xFF484848),
+                    radius = outerR - 1f,
+                    style = Stroke(width = 3.5f)
+                )
+
+                // Second inner rim ring
+                drawCircle(
+                    color = Color(0xFF2E2E2E),
+                    radius = outerR - 5f,
+                    style = Stroke(width = 1f)
+                )
+
+                // Groove rings — high contrast alternating for depth
+                var r = outerR * 0.94f
                 var toggle = false
                 while (r > outerR * 0.565f) {
                     drawCircle(
-                        color = if (toggle) Color(0xFF1C1C1C) else Color(0xFF161616),
+                        color = if (toggle) Color(0xFF323232) else Color(0xFF161616),
                         radius = r,
-                        style = Stroke(width = 1.5f)
+                        style = Stroke(width = 1.6f)
                     )
-                    r -= 4.2f
+                    r -= 4.5f
                     toggle = !toggle
                 }
 
-                // Outer edge highlight ring
-                drawCircle(
-                    color = Color(0xFF2A2A2A),
-                    radius = outerR - 1.5f,
-                    style = Stroke(width = 2.5f)
-                )
-
-                // Shine arc (upper-left quadrant, very subtle)
+                // Shine arc (upper-left, 10% alpha — visible highlight)
                 drawArc(
                     brush = Brush.sweepGradient(
                         colors = listOf(
                             Color.White.copy(alpha = 0f),
-                            Color.White.copy(alpha = 0.04f),
-                            Color.White.copy(alpha = 0.07f),
-                            Color.White.copy(alpha = 0.04f),
+                            Color.White.copy(alpha = 0.06f),
+                            Color.White.copy(alpha = 0.12f),
+                            Color.White.copy(alpha = 0.06f),
                             Color.White.copy(alpha = 0f),
                         ),
                         center = androidx.compose.ui.geometry.Offset(cx, cy)
                     ),
-                    startAngle = 200f,
-                    sweepAngle = 100f,
+                    startAngle = 195f,
+                    sweepAngle = 110f,
                     useCenter = false,
-                    style = Stroke(width = outerR * 0.06f)
+                    style = Stroke(width = outerR * 0.07f)
                 )
 
-                // Label circle background
+                // Label area — dark navy (visually distinct from the grooves)
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFF1E1E1E), Color(0xFF141414)),
+                        colors = listOf(Color(0xFF162040), Color(0xFF0A1428)),
                         center = androidx.compose.ui.geometry.Offset(cx, cy),
-                        radius = outerR * 0.54f
+                        radius = outerR * 0.545f
                     ),
-                    radius = outerR * 0.54f
+                    radius = outerR * 0.545f
                 )
 
-                // Label edge ring
+                // Label ring — subtle blue edge
                 drawCircle(
-                    color = Color(0xFF282828),
-                    radius = outerR * 0.54f,
-                    style = Stroke(width = 1f)
+                    color = Color(0xFF2A4A88),
+                    radius = outerR * 0.545f,
+                    style = Stroke(width = 1.5f)
                 )
 
-                // Center spindle — outer ring
-                drawCircle(color = Color(0xFF3A3A3A), radius = outerR * 0.055f)
-                // Center spindle — hole
-                drawCircle(color = Color(0xFF000000), radius = outerR * 0.032f)
+                // Spindle outer ring
+                drawCircle(color = Color(0xFF444444), radius = outerR * 0.055f)
+                // Spindle highlight
+                drawCircle(color = Color(0xFF606060), radius = outerR * 0.040f)
+                // Spindle hole
+                drawCircle(color = Color(0xFF080808), radius = outerR * 0.028f)
             }
 
-            // Album art clipped circle in center
+            // Album art circle — centered in the label
             val artSize = size * 0.50f
             Box(
                 modifier = Modifier
@@ -163,7 +169,7 @@ fun VinylDisk(
                     Canvas(modifier = Modifier.fillMaxSize()) {
                         drawCircle(
                             brush = Brush.radialGradient(
-                                colors = listOf(Color(0xFF2A2A2A), Color(0xFF080808))
+                                colors = listOf(Color(0xFF1E3A6E), Color(0xFF0A1428))
                             )
                         )
                     }

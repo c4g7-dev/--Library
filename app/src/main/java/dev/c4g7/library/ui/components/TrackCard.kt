@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import dev.c4g7.library.data.Track
-import dev.c4g7.library.ui.theme.AccentRed
+import dev.c4g7.library.ui.theme.AccentBlue
 import dev.c4g7.library.ui.theme.TextSecondary
 
 @Composable
@@ -43,7 +43,7 @@ fun TrackCard(
                 .then(
                     if (isCurrentlyPlaying) Modifier.border(
                         width = 2.dp,
-                        color = AccentRed.copy(alpha = 0.85f),
+                        color = AccentBlue.copy(alpha = 0.85f),
                         shape = RoundedCornerShape(14.dp)
                     ) else Modifier
                 )
@@ -150,7 +150,7 @@ private fun EqualizerBars(
                     modifier = Modifier
                         .width(3.dp)
                         .height((if (isPlaying) h else 4f).dp)
-                        .background(AccentRed, RoundedCornerShape(1.dp))
+                        .background(AccentBlue, RoundedCornerShape(1.dp))
                 )
             }
         }

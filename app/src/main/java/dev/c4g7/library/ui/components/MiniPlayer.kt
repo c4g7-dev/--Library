@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import dev.c4g7.library.data.Track
-import dev.c4g7.library.ui.theme.AccentRed
+import dev.c4g7.library.ui.theme.AccentBlue
 import dev.c4g7.library.ui.theme.TextSecondary
 
 @Composable
@@ -52,7 +52,7 @@ fun MiniPlayer(
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth(progress.coerceIn(0f, 1f))
-                    .background(AccentRed)
+                    .background(AccentBlue)
             )
         }
 

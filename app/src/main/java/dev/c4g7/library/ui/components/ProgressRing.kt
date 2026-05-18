@@ -8,13 +8,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import dev.c4g7.library.ui.theme.AccentRed
+import dev.c4g7.library.ui.theme.AccentBlue
 
 @Composable
 fun ProgressRing(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color = AccentRed,
+    color: Color = AccentBlue,
     strokeWidth: Float = 6f
 ) {
     if (progress <= 0f) return
