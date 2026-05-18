@@ -75,6 +75,9 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
                     )
                 }.sortedBy { it.title }
                 _state.value = LibraryState.Success(tracks)
+            } catch (e: SecurityException) {
+                securePrefs.zipUriString = ""
+                _state.value = LibraryState.Error("File permission expired — re-select the ZIP in Settings")
             } catch (e: Exception) {
                 _state.value = LibraryState.Error(e.message ?: "Failed to load archive")
             }
