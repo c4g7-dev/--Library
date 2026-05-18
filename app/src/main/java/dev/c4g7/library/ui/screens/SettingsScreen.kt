@@ -1,5 +1,6 @@
 package dev.c4g7.library.ui.screens
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,13 +35,20 @@ fun SettingsScreen(
     onLoad: () -> Unit
 ) {
     val strings = LocalStrings.current
+    val context = LocalContext.current
     var zipUri by remember { mutableStateOf(libraryViewModel.savedZipUri) }
     var gapless by remember { mutableStateOf(false) }
 
     val zipPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
-        if (uri != null) zipUri = uri.toString()
+        if (uri != null) {
+            // Persist read permission so it survives app restarts
+            context.contentResolver.takePersistableUriPermission(
+                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            zipUri = uri.toString()
+        }
     }
 
     Scaffold(
