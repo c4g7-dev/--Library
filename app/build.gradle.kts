@@ -54,11 +54,8 @@ dependencies {
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.media3.exoplayer)
-    implementation(libs.media3.session)
     implementation(libs.coil.compose)
     implementation(libs.zip4j)
-    implementation(libs.security.crypto)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.appcompat)
     debugImplementation(libs.androidx.ui.tooling)
 }
