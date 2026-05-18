@@ -1,4 +1,14 @@
-node_modules/
-dist/
+*.iml
+.gradle
+/local.properties
+/.idea
 .DS_Store
-*.local
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.jks
+*.keystore
+app/build/
+gradle/wrapper/gradle-wrapper.jar

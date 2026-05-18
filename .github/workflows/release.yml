@@ -15,31 +15,33 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
-    name: Build & Release
+  build-apk:
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          node-version: 20
-          cache: npm
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
 
-      - name: Build
-        run: npm run build
+      - name: Build Debug APK
+        run: gradle assembleDebug
 
-      - name: Zip dist
+      - name: Rename APK
         run: |
-          cd dist
-          zip -r ../library-web-${{ github.ref_name || github.event.inputs.tag }}.zip .
-          cd ..
+          TAG=${{ github.ref_name || github.event.inputs.tag }}
+          cp app/build/outputs/apk/debug/app-debug.apk library-${TAG}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -47,23 +49,23 @@ jobs:
           tag_name: ${{ github.ref_name || github.event.inputs.tag }}
           name: Library ${{ github.ref_name || github.event.inputs.tag }}
           body: |
-            ## Library Music Player
+            ## Library ${{ github.ref_name || github.event.inputs.tag }}
 
-            AMOLED dark music player — `.opus` file support with spinning vinyl disk UI.
+            AMOLED dark music player for Android. Plays `.opus` files from a password-protected ZIP.
 
             ### Install
-            **Web:** Extract `library-web-*.zip` and serve with any static file server.
+            1. Download `library-*.apk`
+            2. On your Android device: **Settings → Apps → Install unknown apps** → allow your browser/Files app
+            3. Open the APK and install
 
-            **Android (Capacitor):** Use the web zip with `npx cap sync android && npx cap build android` locally to produce an APK.
+            ### First launch
+            1. Go to **Settings** tab
+            2. Tap the folder icon to pick your `.zip` file
+            3. Enter your decrypt passphrase
+            4. Tap **Unlock & Load Library**
+            5. Tap any track in the grid to play
 
-            ### What's new
-            - 3-column AMOLED library grid with cover arts
-            - Spinning vinyl disk player
-            - Red arc progress rings per track
-            - Folder-based `.opus` file loading
-            - Settings with directory picker
-          files: |
-            library-web-${{ github.ref_name || github.event.inputs.tag }}.zip
+            > Debug build — unsigned. For a signed release APK see the README.
+          files: library-${{ github.ref_name || github.event.inputs.tag }}.apk
           draft: false
           prerelease: false
-          generate_release_notes: false
