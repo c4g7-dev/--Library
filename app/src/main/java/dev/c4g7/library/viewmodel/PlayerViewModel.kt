@@ -29,6 +29,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     private val _state = MutableStateFlow(PlayerState())
     val state: StateFlow<PlayerState> = _state.asStateFlow()
 
+    // Read by PlayerScreen's transitionSpec — set before ExoPlayer fires its listener
+    var lastSkipDir: Int = 1
+
     val player: ExoPlayer = ExoPlayer.Builder(application).build().apply {
         addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -103,10 +106,12 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun skipNext() {
+        lastSkipDir = 1
         if (player.hasNextMediaItem()) player.seekToNextMediaItem()
     }
 
     fun skipPrev() {
+        lastSkipDir = -1
         if (player.currentPosition > 3000) player.seekTo(0)
         else if (player.hasPreviousMediaItem()) player.seekToPreviousMediaItem()
     }

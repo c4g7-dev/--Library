@@ -1,5 +1,6 @@
 package dev.c4g7.library.ui.screens
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -90,39 +91,47 @@ fun PlayerScreen(playerViewModel: PlayerViewModel) {
                     modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Title
-                    Text(
-                        text = state.currentTrack?.title ?: strings.nothingPlaying,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        letterSpacing = (-0.2).sp
-                    )
-
-                    Spacer(Modifier.height(4.dp))
-
-                    // Artist
-                    Text(
-                        text = state.currentTrack?.artist ?: "",
-                        fontSize = 13.sp,
-                        color = TextSecondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    // Album
-                    if (!state.currentTrack?.album.isNullOrEmpty() &&
-                        state.currentTrack?.album != state.currentTrack?.artist
-                    ) {
-                        Text(
-                            text = state.currentTrack?.album ?: "",
-                            fontSize = 11.sp,
-                            color = Color(0xFF444444),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    AnimatedContent(
+                        targetState = state.currentTrack,
+                        transitionSpec = {
+                            val dir = playerViewModel.lastSkipDir
+                            if (dir >= 0)
+                                (slideInHorizontally(tween(350)) { it / 3 } + fadeIn(tween(300)))
+                                    .togetherWith(slideOutHorizontally(tween(250)) { -(it / 3) } + fadeOut(tween(200)))
+                            else
+                                (slideInHorizontally(tween(350)) { -(it / 3) } + fadeIn(tween(300)))
+                                    .togetherWith(slideOutHorizontally(tween(250)) { it / 3 } + fadeOut(tween(200)))
+                        },
+                        label = "trackInfo"
+                    ) { track ->
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = track?.title ?: strings.nothingPlaying,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                letterSpacing = (-0.2).sp
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = track?.artist ?: "",
+                                fontSize = 13.sp,
+                                color = TextSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            if (!track?.album.isNullOrEmpty() && track?.album != track?.artist) {
+                                Text(
+                                    text = track?.album ?: "",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFF444444),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))

@@ -2,6 +2,7 @@ package dev.c4g7.library.ui.navigation
 
 import android.content.Context
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
@@ -30,6 +31,8 @@ import dev.c4g7.library.ui.screens.PlayerScreen
 import dev.c4g7.library.ui.screens.SettingsScreen
 import dev.c4g7.library.viewmodel.LibraryViewModel
 import dev.c4g7.library.viewmodel.PlayerViewModel
+
+private val routeOrder = mapOf("library" to 0, "player" to 1, "settings" to 2)
 
 private sealed class Screen(val route: String) {
     object Library : Screen("library")
@@ -117,7 +120,31 @@ fun AppNavGraph(modifier: Modifier = Modifier) {
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Library.route,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    enterTransition = {
+                        val from = routeOrder[initialState.destination.route] ?: 0
+                        val to = routeOrder[targetState.destination.route] ?: 0
+                        slideInHorizontally(tween(300)) { if (to >= from) it / 4 else -(it / 4) } +
+                            fadeIn(tween(300))
+                    },
+                    exitTransition = {
+                        val from = routeOrder[initialState.destination.route] ?: 0
+                        val to = routeOrder[targetState.destination.route] ?: 0
+                        slideOutHorizontally(tween(300)) { if (to >= from) -(it / 4) else it / 4 } +
+                            fadeOut(tween(200))
+                    },
+                    popEnterTransition = {
+                        val from = routeOrder[initialState.destination.route] ?: 0
+                        val to = routeOrder[targetState.destination.route] ?: 0
+                        slideInHorizontally(tween(300)) { if (to >= from) it / 4 else -(it / 4) } +
+                            fadeIn(tween(300))
+                    },
+                    popExitTransition = {
+                        val from = routeOrder[initialState.destination.route] ?: 0
+                        val to = routeOrder[targetState.destination.route] ?: 0
+                        slideOutHorizontally(tween(300)) { if (to >= from) -(it / 4) else it / 4 } +
+                            fadeOut(tween(200))
+                    }
                 ) {
                     composable(Screen.Library.route) {
                         LibraryScreen(
