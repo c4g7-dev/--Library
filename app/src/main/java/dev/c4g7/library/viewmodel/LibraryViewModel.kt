@@ -50,7 +50,41 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun loadFromSaved() {
-        loadFromUri(Uri.parse(securePrefs.zipUriString))
+        // Check if files already exist in music directory to avoid re-extraction
+        if (musicDir.exists() && musicDir.listFiles()?.any { it.extension == "opus" } == true) {
+            loadFromCachedFiles()
+        } else {
+            loadFromUri(Uri.parse(securePrefs.zipUriString))
+        }
+    }
+
+    private fun loadFromCachedFiles() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.value = LibraryState.Loading
+            try {
+                val files = musicDir.listFiles { file -> file.extension == "opus" } ?: emptyArray()
+                if (files.isEmpty()) {
+                    // No cached files, fallback to loading from URI
+                    loadFromUri(Uri.parse(securePrefs.zipUriString))
+                    return@launch
+                }
+                val tracks = files.map { file ->
+                    val meta = metadataExtractor.extractFromFile(file)
+                    Track(
+                        id = file.absolutePath,
+                        title = meta.title,
+                        artist = meta.artist,
+                        album = meta.album,
+                        uri = Uri.fromFile(file),
+                        coverArtBytes = meta.coverArtBytes,
+                        durationMs = meta.durationMs
+                    )
+                }.sortedBy { it.title }
+                _state.value = LibraryState.Success(tracks)
+            } catch (e: Exception) {
+                _state.value = LibraryState.Error(e.message ?: "Failed to load cached files")
+            }
+        }
     }
 
     private fun loadFromUri(zipUri: Uri) {
@@ -77,6 +111,26 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
                 _state.value = LibraryState.Success(tracks)
             } catch (e: Exception) {
                 _state.value = LibraryState.Error(e.message ?: "Failed to load archive")
+            }
+        }
+    }
+
+    fun clearLibrary() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Clear the saved URI
+                securePrefs.zipUriString = ""
+
+                // Delete all cached music files
+                if (musicDir.exists()) {
+                    musicDir.deleteRecursively()
+                }
+
+                // Reset state
+                _state.value = LibraryState.Empty
+                _trackProgress.value = emptyMap()
+            } catch (e: Exception) {
+                // Silently ignore errors during cleanup
             }
         }
     }

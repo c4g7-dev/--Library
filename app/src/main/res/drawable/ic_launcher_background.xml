@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Black background -->
+    <item>
+        <color android:color="#000000" />
+    </item>
+    <!-- The actual icon will be in the foreground -->
+</layer-list>

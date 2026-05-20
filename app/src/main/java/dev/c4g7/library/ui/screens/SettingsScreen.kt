@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FolderZip
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.c4g7.library.ui.i18n.LocalStrings
 import dev.c4g7.library.ui.theme.AccentBlue
+import dev.c4g7.library.viewmodel.LibraryState
 import dev.c4g7.library.viewmodel.LibraryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,9 @@ fun SettingsScreen(
     val strings = LocalStrings.current
     var zipUri by remember { mutableStateOf(libraryViewModel.savedZipUri) }
     var gapless by remember { mutableStateOf(false) }
+
+    val libraryState by libraryViewModel.state.collectAsState()
+    val isLoading = libraryState is LibraryState.Loading
 
     val zipPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -99,24 +104,53 @@ fun SettingsScreen(
                             singleLine = true
                         )
 
-                        Button(
-                            onClick = {
-                                if (zipUri.isNotEmpty()) {
-                                    libraryViewModel.loadZip(Uri.parse(zipUri))
-                                    onLoad()
-                                }
-                            },
-                            enabled = zipUri.isNotEmpty(),
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AccentBlue,
-                                contentColor = Color(0xFF000000),
-                                disabledContainerColor = Color(0xFF1E1E1E),
-                                disabledContentColor = Color(0xFF444444)
-                            ),
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(strings.loadLibrary, fontWeight = FontWeight.SemiBold)
+                            Button(
+                                onClick = {
+                                    if (zipUri.isNotEmpty()) {
+                                        libraryViewModel.loadZip(Uri.parse(zipUri))
+                                        onLoad()
+                                    }
+                                },
+                                enabled = zipUri.isNotEmpty() && !isLoading,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = AccentBlue,
+                                    contentColor = Color(0xFF000000),
+                                    disabledContainerColor = Color(0xFF1E1E1E),
+                                    disabledContentColor = Color(0xFF444444)
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.Black,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(strings.loadLibrary, fontWeight = FontWeight.SemiBold)
+                                }
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    zipUri = ""
+                                    libraryViewModel.clearLibrary()
+                                },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = Color(0xFF1E1E1E),
+                                    contentColor = Color(0xFFCC3333)
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Filled.Delete,
+                                    contentDescription = strings.clearLibrary,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
                         }
                     }
                 }

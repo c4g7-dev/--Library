@@ -2,6 +2,7 @@ package dev.c4g7.library.ui.navigation
 
 import android.content.Context
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
@@ -117,7 +118,9 @@ fun AppNavGraph(modifier: Modifier = Modifier) {
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Library.route,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    enterTransition = { fadeIn(animationSpec = tween(200)) },
+                    exitTransition = { fadeOut(animationSpec = tween(200)) }
                 ) {
                     composable(Screen.Library.route) {
                         LibraryScreen(

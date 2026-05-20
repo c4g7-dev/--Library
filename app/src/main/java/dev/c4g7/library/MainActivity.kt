@@ -16,6 +16,10 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = android.graphics.Color.TRANSPARENT
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
+        // Reset window background after splash screen
+        window.setBackgroundDrawableResource(android.R.color.black)
+
         setContent {
             LibraryTheme {
                 AppNavGraph(modifier = Modifier.fillMaxSize())

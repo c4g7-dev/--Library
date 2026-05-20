@@ -4,14 +4,66 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Die drei text (white) -->
     <path
-        android:fillColor="#FFEF5350"
-        android:pathData="M54,54m-30,0a30,30 0 1,0 60,0a30,30 0 1,0 -60,0" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M 25,30 L 30,30 Q 34,30 34,34 L 34,40 Q 34,44 30,44 L 25,44 L 25,30 Z M 28,33 L 28,41 L 30,41 Q 31,41 31,40 L 31,34 Q 31,33 30,33 L 28,33 Z" />
+
     <path
-        android:fillColor="#FF000000"
-        android:pathData="M54,54m-10,0a10,10 0 1,0 20,0a10,10 0 1,0 -20,0" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M 37,30 L 40,30 L 40,33 L 37,33 Z M 37,36 L 40,36 L 40,44 L 37,44 Z" />
+
     <path
-        android:fillColor="#FFEF5350"
-        android:pathData="M30,35 L45,60 L63,60 L78,35 Z"
-        android:strokeWidth="0" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M 43,36 L 49,36 Q 51,36 51,38 L 51,40 Q 51,42 49,42 L 46,42 L 46,41 Q 46,41 47,41 L 49,41 L 49,38 Q 49,37 48,37 L 45,37 Q 43,37 43,39 L 43,41 Q 43,43 45,43 L 51,43 L 51,44 L 45,44 Q 43,44 43,42 L 43,38 Q 43,36 45,36 Z" />
+
+    <!-- Question marks -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 36,54 Q 36,50 40,50 Q 44,50 44,54 L 44,56 Q 44,59 41,60 L 40,61 L 40,63 L 37,63 L 37,60 L 39,59 Q 41,58 41,56 L 41,54 Q 41,52 40,52 Q 39,52 39,54 L 39,55 L 36,55 Z M 37,65 L 40,65 L 40,68 L 37,68 Z" />
+
+    <path
+        android:fillColor="#FF3333"
+        android:pathData="M 48,54 Q 48,50 52,50 Q 56,50 56,54 L 56,56 Q 56,59 53,60 L 52,61 L 52,63 L 49,63 L 49,60 L 51,59 Q 53,58 53,56 L 53,54 Q 53,52 52,52 Q 51,52 51,54 L 51,55 L 48,55 Z M 49,65 L 52,65 L 52,68 L 49,68 Z" />
+
+    <path
+        android:fillColor="#3399FF"
+        android:pathData="M 60,54 Q 60,50 64,50 Q 68,50 68,54 L 68,56 Q 68,59 65,60 L 64,61 L 64,63 L 61,63 L 61,60 L 63,59 Q 65,58 65,56 L 65,54 Q 65,52 64,52 Q 63,52 63,54 L 63,55 L 60,55 Z M 61,65 L 64,65 L 64,68 L 61,68 Z" />
+
+    <!-- Library text in green stylized font -->
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 30,72 L 32,72 L 32,77 L 35,77 L 35,79 L 30,79 Z" />
+
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 37,74 L 39,74 L 39,79 L 37,79 Z M 37,71 L 39,71 L 39,73 L 37,73 Z" />
+
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 41,71 L 43,71 L 43,74 Q 44,74 45,74 Q 47,74 47,76 L 47,77 Q 47,79 45,79 L 41,79 Z M 43,76 L 43,77 Q 43,78 44,78 L 45,78 Q 45,77 45,76 Q 45,75 44,75 L 43,75 Z" />
+
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 49,74 L 51,74 L 51,75 Q 52,74 53,74 L 53,76 Q 52,76 51,76 L 51,79 L 49,79 Z" />
+
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 55,76 Q 55,74 57,74 Q 59,74 59,76 L 59,76 L 57,76 Q 57,75 56,75 Q 55,75 55,76 L 55,77 Q 55,78 56,78 Q 57,78 57,77 L 59,77 Q 59,79 57,79 Q 55,79 55,77 Z" />
+
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 61,74 L 63,74 L 63,75 Q 64,74 65,74 L 65,76 Q 64,76 63,76 L 63,79 L 61,79 Z" />
+
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 67,74 L 69,74 L 70,77 L 71,74 L 73,74 L 71,78 Q 70,80 68,80 L 68,78 Q 69,78 69,77 L 67,74 Z" />
+
+    <!-- Smiley face -->
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M 78,72 Q 77,72 77,73 Q 77,74 78,74 Q 79,74 79,73 Q 79,72 78,72 Z M 72,78 Q 73,79 75,79 Q 77,79 78,78"
+        android:strokeColor="#66BB6A"
+        android:strokeWidth="0.5" />
 </vector>
